@@ -15,6 +15,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 
 @Entity
@@ -26,17 +30,24 @@ public class Contrato {
 	private Long id;
 	
 	@ManyToOne(optional = false)
+	@NotNull(message="La propiedad es obligatoria")
 	private Propiedad propiedad;
 	
 	@ManyToOne(optional = false)
+	@NotNull(message = "El inquilino es obligatorio")
 	private Persona inquilino;
 	
+	@NotNull(message = "La fecha de inicio es obligatoria")
 	private LocalDate fechaInicio;
-	
+	@NotNull(message = "La duración es obligatoria")
+    @Positive(message = "La duración debe ser mayor a 0 meses")
 	private Integer duracionMeses;
-	
+	@NotNull(message = "El importe es obligatorio")
+    @Positive(message = "El importe debe ser un número positivo") // <-- Evita negativos y cero
 	private BigDecimal importeMensual;
-	
+	@NotNull(message = "El día de vencimiento es obligatorio")
+    @Min(value = 1, message = "El día mínimo es 1")
+    @Max(value = 31, message = "El día máximo es 31")
 	private Integer diaVencimientoMensual;
 	
 	@Column(length = 2000)
