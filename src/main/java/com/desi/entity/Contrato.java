@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,8 +40,10 @@ public class Contrato {
 	@NotNull(message = "El inquilino es obligatorio")
 	private Persona inquilino;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@NotNull(message = "La fecha de inicio es obligatoria")
 	private LocalDate fechaInicio;
+	
 	@NotNull(message = "La duración es obligatoria")
     @Positive(message = "La duración debe ser mayor a 0 meses")
 	private Integer duracionMeses;
@@ -73,6 +78,7 @@ public class Contrato {
 	
 	// --- Getters y Setters ---
     public Long getId() { return id; }
+    public void setId(Long  id) { this.id = id; }
 
     public Propiedad getPropiedad() { return propiedad; }
     public void setPropiedad(Propiedad propiedad) { this.propiedad = propiedad; }

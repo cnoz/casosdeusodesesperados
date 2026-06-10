@@ -54,8 +54,10 @@ public class ContratoController {
         contratoService.guardar(contrato);
         return "redirect:/contratos";
     }
-*/    
+*/   
+    
     public String guardar(@Valid @ModelAttribute("contrato") Contrato contrato, BindingResult result, Model model) {
+    	//System.out.println("ID DEL CONTRATO RECIBIDO: " + contrato.getId());
         if (result.hasErrors()) {
             // Si hay errores, volvemos a cargar las listas para los desplegables
             model.addAttribute("propiedades", propiedadService.listarTodas());
@@ -63,7 +65,7 @@ public class ContratoController {
             model.addAttribute("estados", EstadoContrato.values());
             return "contrato-form"; 
         }
-        // Lógica Pro: Si es un contrato nuevo, le agregamos el estado inicial a tu historial
+        // Si es un contrato nuevo, le agregamos el estado inicial a tu historial
         if (contrato.getId() == null && contrato.getEstado() != null) {
             contrato.agregarCambioEstado(contrato.getEstado());
         }
@@ -86,12 +88,15 @@ public class ContratoController {
         Contrato contrato = contratoService.buscarPorId(id);
         model.addAttribute("contrato", contrato);
         
-        // También pasamos las propiedades por si quiere cambiar la propiedad del contrato
+        // También pasamos las propiedades por si quiere cambiar la propiedad del contrato, inquilino y estado
         model.addAttribute("propiedades", propiedadService.listarTodas());
-        
+        model.addAttribute("inquilinos", personaService.listarTodas());
+        model.addAttribute("estados", EstadoContrato.values());
         return "contrato-form";
     }
 
+    
+    
     // 5. ELIMINAR CONTRATO
     @GetMapping("/contrato/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
