@@ -12,7 +12,7 @@ import com.desi.entity.HistorialEstadoContrato;
 import com.desi.entity.Propiedad;
 import com.desi.repository.ContratoRepository;
 import com.desi.repository.PropiedadRepository;
-import com.desi.repository.HistorialEstadoRepository;
+import com.desi.repository.HistorialEstadoContratoRepository;
 
 @Service
 public class ContratoServiceImpl implements ContratoService{
@@ -20,10 +20,10 @@ public class ContratoServiceImpl implements ContratoService{
 	// Dependencia del repositorio (Base de datos)
     private final ContratoRepository contratoRepository;
     private final PropiedadRepository propiedadRepository; /*  AGREGADO	*/
-    private final HistorialEstadoRepository historialEstadoRepository;
+    private final HistorialEstadoContratoRepository historialEstadoRepository;
 
     // Inyección por constructor
-    public ContratoServiceImpl(ContratoRepository contratoRepository, PropiedadRepository propiedadRepository, HistorialEstadoRepository historialEstadoRepository) {
+    public ContratoServiceImpl(ContratoRepository contratoRepository, PropiedadRepository propiedadRepository, HistorialEstadoContratoRepository historialEstadoRepository) {
         this.contratoRepository = contratoRepository;
         this.propiedadRepository = propiedadRepository;
         this.historialEstadoRepository= historialEstadoRepository;
