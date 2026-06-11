@@ -57,8 +57,8 @@ public class ContratoController {
     @PostMapping("/contratos")
     public String guardar(@Valid @ModelAttribute("contrato") Contrato contrato, BindingResult result, Model model) {
     	//System.out.println("ID DEL CONTRATO RECIBIDO: " + contrato.getId());
+        // Si hay errores, volvemos a cargar las listas para los desplegables
         if (result.hasErrors()) {
-            // Si hay errores, volvemos a cargar las listas para los desplegables
             model.addAttribute("propiedades", propiedadService.listarTodas());
             model.addAttribute("inquilinos", personaService.listarTodas());
             model.addAttribute("estados", EstadoContrato.values());
@@ -68,9 +68,22 @@ public class ContratoController {
         if (contrato.getId() == null && contrato.getEstado() != null) {
             contrato.agregarCambioEstado(contrato.getEstado());
         }
-
-        contratoService.guardar(contrato);
-        return "redirect:/contratos";
+        
+        try {
+        	  contratoService.guardar(contrato);
+        	  return "redirect:/contratos";
+        } catch(RuntimeException e) {
+        	
+        	result.rejectValue("propiedad", "error.propiedad", e.getMessage());
+        	
+        	model.addAttribute("propiedades", propiedadService.listarTodas());
+        	model.addAttribute("inquilinos", personaService.listarTodas());
+        	model.addAttribute("estados", EstadoContrato.values());
+        	
+        	return "contrato-form";
+        }
+   
+        
     }
 
     /*

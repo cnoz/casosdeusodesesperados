@@ -41,7 +41,7 @@
             <tr>
 				<th>ID</th>
 				<th>Propiedad</th>
-                <th>Propietario</th>
+               
                 <th>Inquilino</th>
                 <th>Fecha Inicio</th>
                 <th>Importe Mensual</th>
@@ -60,7 +60,6 @@
 				                
 				<td th:text="${c.propiedad != null ? c.propiedad.direccion : 'No asignada'}"></td>
 				                
-				<td th:text="${c.propiedad != null && c.propiedad.propietario != null ? (c.propiedad.propietario.apellido + ', ' + c.propiedad.propietario.nombre) : 'Sin Propietario'}"></td>
 				                
 				<td th:text="${c.inquilino != null ? (c.inquilino.apellido + ', ' + c.inquilino.nombre) : 'No asignado'}"></td>
 				                
@@ -91,7 +90,7 @@
 				</td>
 			</tr>
 			<tr th:if="${#lists.isEmpty(contratos)}">
-			    <td colspan="9" class="text-center text-muted py-4">No hay contratos registrados en el sistema.</td>
+			    <td colspan="8" class="text-center text-muted py-4">No hay contratos registrados en el sistema.</td>
 			</tr>
         </tbody>
     </table>

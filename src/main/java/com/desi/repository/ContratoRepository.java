@@ -13,6 +13,9 @@ public interface ContratoRepository extends JpaRepository <Contrato, Long>  {
 	boolean existsByPropiedadAndEstadoAndEliminadoFalse(
 			Propiedad propiedad,
 			EstadoContrato estado);
+	Contrato findByPropiedadAndEstadoAndEliminadoFalse(Propiedad propiedad, EstadoContrato estado);
+	// Cambiás findBy... por findFirstBy...
+	// Contrato findFirstByPropiedadAndEstadoAndEliminadoFalse(Propiedad propiedad, EstadoContrato estado);
 	
 	@Query("SELECT c FROM Contrato c WHERE " +
 	           "(:direccion IS NULL OR c.propiedad.direccion LIKE %:direccion%) AND " +
