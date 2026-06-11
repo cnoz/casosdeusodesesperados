@@ -12,7 +12,30 @@
         <h2>Gestión de Contratos</h2>
         <a th:href="@{/contrato/nuevo}" class="btn btn-primary">Nuevo Contrato</a>
     </div>
-
+	
+		<!--barra de filtro-->
+	<form method="get" th:action="@{/contratos}" class="row g-3 mb-4 p-3 bg-light rounded border">
+				    <div class="col-md-3">
+				        <input type="text" name="propiedad" th:value="${propiedadBuscada}" class="form-control" placeholder="Buscar por Propiedad...">
+				    </div>
+				    <div class="col-md-3">
+				        <input type="text" name="inquilino" th:value="${inquilinoBuscado}" class="form-control" placeholder="Buscar por Inquilino...">
+				    </div>
+				    <div class="col-md-2">
+				        <select name="estado" class="form-select">
+				            <option value="">-- Estado --</option>
+				            <option th:each="est : ${estados}" th:value="${est}" th:text="${est}" th:selected="${est == estadoBuscado}"></option>
+				        </select>
+				    </div>
+				    <div class="col-md-2">
+				        <input type="date" name="fechaInicio" th:value="${fechaBuscada}" class="form-control">
+				    </div>
+				    <div class="col-md-2 d-flex gap-2">
+				        <button type="submit" class="btn btn-dark w-100">Filtrar</button>
+				        <a th:href="@{/contratos}" class="btn btn-outline-secondary">Limpiar</a>
+				    </div>
+				</form>
+	
     <table class="table table-striped table-bordered align-middle shadow-sm">
         <thead class="table-dark text-center">
             <tr>
@@ -28,6 +51,9 @@
             </tr>
         </thead>
         <tbody>
+			
+						
+			
             <tr th:each="c : ${contratos}">
 				
 				<td class="text-center fw-bold" th:text="${c.id}"></td>
@@ -69,7 +95,7 @@
 			</tr>
         </tbody>
     </table>
-
+	<a th:href="@{/}" class="btn btn-secondary mt-3">Inicio</a>
     <a th:href="@{/propiedades}" class="btn btn-secondary mt-3">Ir a Propiedades</a>
 </body>
 

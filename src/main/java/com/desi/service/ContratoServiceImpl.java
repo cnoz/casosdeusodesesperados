@@ -1,10 +1,12 @@
 package com.desi.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.desi.entity.Contrato;
+import com.desi.entity.EstadoContrato;
 import com.desi.repository.ContratoRepository;
 
 @Service
@@ -19,11 +21,22 @@ public class ContratoServiceImpl implements ContratoService{
     }
 
     @Override
+    public List<Contrato> listarConFiltros(String propiedad, String inquilino, EstadoContrato estado, LocalDate fechaInicio) {
+        // Si los textos vienen vacíos desde el HTML, los pasamos a null
+        String propFiltro = (propiedad != null && !propiedad.isBlank()) ? propiedad : null;
+        String inqFiltro = (inquilino != null && !inquilino.isBlank()) ? inquilino : null;
+
+        return contratoRepository.filtrarContratos(propFiltro, inqFiltro, estado, fechaInicio);
+    }
+    
+    /*
+    @Override
     public List<Contrato> listarTodos() {
         // .findAll() viene heredado de JpaRepository
         return contratoRepository.findAll();
     }
-
+     */
+    
     @Override
     public void guardar(Contrato contrato) {
         // .save() sirve tanto para insertar uno nuevo como para actualizar
