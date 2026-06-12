@@ -28,4 +28,6 @@ public interface ContratoRepository extends JpaRepository <Contrato, Long>  {
 			@Param("estado") EstadoContrato estado,
 			@Param("fechaInicio") LocalDate fechaInicio);
 
+	
+	List<Contrato> findByPropiedadIdAndEstado(Long propiedadId, EstadoContrato estado);
 }
