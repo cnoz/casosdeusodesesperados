@@ -38,7 +38,7 @@ public class ContratoServiceImpl implements ContratoService{
         return contratoRepository.filtrarContratos(propFiltro, inqFiltro, estado, fechaInicio);
     }
     
-    
+    /*
     @Override
     public void guardar(Contrato contrato) {
 
@@ -48,8 +48,7 @@ public class ContratoServiceImpl implements ContratoService{
             Propiedad propiedadCompleta = propiedadRepository.findById(contrato.getPropiedad().getId()).orElse(null);
             contrato.setPropiedad(propiedadCompleta);
         }
-    	
-        ////
+
         // 🌟 HISTORIAL - PARTE A: Averiguamos el estado anterior antes de que impacte el .save()
         EstadoContrato estadoAnterior = null;
         if (contrato.getId() != null) {
@@ -58,11 +57,10 @@ public class ContratoServiceImpl implements ContratoService{
             if (contratoViejo != null) {
                 estadoAnterior = contratoViejo.getEstado();
             }
+        } else {
+        	contrato.setEstado(EstadoContrato.BORRADOR);
         }
-        
-        ////
-        
-        
+/*
         // 1. REGLA DE NEGOCIO: Solo validamos si se intenta pasar a ACTIVO
         if (contrato.getEstado() == EstadoContrato.ACTIVO) {
             
@@ -91,12 +89,7 @@ public class ContratoServiceImpl implements ContratoService{
                 propiedadRepository.save(propiedad); 
             }
         }
-
-        // 🌟 LA LÍNEA MÁGICA QUE TE FALTABA: Guardar el contrato en la base de datos 🌟
-        // Esto tiene que estar AFUERA del "if (EstadoContrato.ACTIVO)" para que también guarde los Borradores.
-        //contratoRepository.save(contrato);
-        
-        ////
+*//*
         Contrato contratoGuardado = contratoRepository.save(contrato);
      // 🌟 HISTORIAL - PARTE B: Si el contrato es nuevo (estadoAnterior == null) o el estado cambió
         if (estadoAnterior == null || !estadoAnterior.equals(contratoGuardado.getEstado())) {
@@ -111,44 +104,46 @@ public class ContratoServiceImpl implements ContratoService{
             historialEstadoRepository.save(historial);
         }
         ////
-    }
+    }*/
     
     
-    
-    
-    /*
     @Override
     public void guardar(Contrato contrato) {
 
-    	if (contrato.getEstado() == EstadoContrato.ACTIVO) {
-    	    
-    	    // 1. Ejecutás la validación del contrato activo único (el existsBy... que hicimos antes)
-    	    boolean yaExisteActivo = contratoRepository.existsByPropiedadAndEstadoAndEliminadoFalse(
-    	        contrato.getPropiedad(), 
-    	        EstadoContrato.ACTIVO
-    	    );
-    	    
-    	    if (yaExisteActivo) {
-    	        // Validación para evitar pisar el mismo contrato en caso de edición
-    	        if (contrato.getId() == null || !contratoRepository.findByPropiedadAndEstadoAndEliminadoFalse(contrato.getPropiedad(), EstadoContrato.ACTIVO).getId().equals(contrato.getId())) {
-    	            throw new RuntimeException("La propiedad seleccionada ya posee un contrato ACTIVO vigente.");
-    	        }
-    	    }
-    	 // 2. ¡Efecto en cadena! Cambiás el estado de la propiedad usando tu enum real
-    	    Propiedad propiedad = contrato.getPropiedad();
-    	    if (propiedad != null) {
-    	        propiedad.setEstadoDisponibilidad(EstadoDisponibilidad.ALQUILADA);
-    	        
-    	        // 💡 Tip de Persistencia: Si en tu entidad Contrato tenés la relación con la propiedad 
-    	        // configurada con CascadeType.MERGE o CascadeType.ALL, al guardar el contrato se guardará la propiedad automáticamente.
-    	        // Si no es el caso, lo ideal es que inyectes PropiedadRepository en este servicio y hagas:
-    	        // propiedadRepository.save(propiedad);
-    	    }
-    	}
-    	
+        // 🌟 PASO OBLIGATORIO: Reenganchar la propiedad completa
+        if (contrato.getPropiedad() != null && contrato.getPropiedad().getId() != null) {
+            Propiedad propiedadCompleta = propiedadRepository.findById(contrato.getPropiedad().getId()).orElse(null);
+            contrato.setPropiedad(propiedadCompleta);
+        }
+
+        // 🌟 HISTORIAL - PARTE A: Averiguamos el estado anterior
+        EstadoContrato estadoAnterior = null;
+        if (contrato.getId() != null) {
+            Contrato contratoViejo = contratoRepository.findById(contrato.getId()).orElse(null);
+            if (contratoViejo != null) {
+                estadoAnterior = contratoViejo.getEstado();
+            }
+        } else {
+        	
+                contrato.setEstado(EstadoContrato.BORRADOR);
+           
+        }
+
+        // Guardamos el contrato con el estado decidido automáticamente
+        Contrato contratoGuardado = contratoRepository.save(contrato);
+
+        // 🌟 HISTORIAL - PARTE B: Registro en el historial si es nuevo o cambió
+        if (estadoAnterior == null || !estadoAnterior.equals(contratoGuardado.getEstado())) {
+            HistorialEstadoContrato historial = new HistorialEstadoContrato(
+                contratoGuardado, 
+                contratoGuardado.getEstado()
+            );
+            historialEstadoRepository.save(historial);
+        }
     }
-*/
     
+      
+            
     
     @Override
     public Contrato buscarPorId(Long id) {
@@ -158,6 +153,7 @@ public class ContratoServiceImpl implements ContratoService{
                 .orElseThrow(() -> new RuntimeException("Contrato no encontrado con el ID: " + id));
     }
 
+    
     @Override
     public void eliminar(Long id) {
         // .deleteById() elimina el registro de la base de datos
@@ -180,6 +176,13 @@ public class ContratoServiceImpl implements ContratoService{
                 && nuevoEstado == EstadoContrato.ACTIVO) {
             throw new IllegalArgumentException("¡Error! No se puede volver a ACTIVAR un contrato que ya está FINALIZADO o RESCINDIDO.");
         }
+        
+        // ****++++  Controla que un contrato finalizado o rescindido no se pueda poner en borrador, Así evito que se pueda volver a ACTIVAR.
+        if ((estadoActual == EstadoContrato.FINALIZADO || estadoActual == EstadoContrato.RESCINDIDO) 
+                && nuevoEstado == EstadoContrato.BORRADOR) {
+            throw new IllegalArgumentException("¡Error! No se puede volver a BORRADOR un contrato que ya está FINALIZADO o RESCINDIDO.");
+        }
+        
 
         // 3. Controlar el paso de Borrador a Activo
         if (estadoActual == EstadoContrato.BORRADOR && nuevoEstado != EstadoContrato.ACTIVO) {
@@ -192,7 +195,9 @@ public class ContratoServiceImpl implements ContratoService{
                 && nuevoEstado != EstadoContrato.RESCINDIDO) {
             throw new IllegalArgumentException("Un contrato ACTIVO solo puede pasar a FINALIZADO o RESCINDIDO.");
         }
-        if (nuevoEstado == EstadoContrato.ACTIVO && estadoActual != EstadoContrato.ACTIVO) {
+        
+        if (nuevoEstado == EstadoContrato.ACTIVO) {
+        /*if (nuevoEstado == EstadoContrato.ACTIVO && estadoActual != EstadoContrato.ACTIVO) {*/
             // Buscamos si la propiedad ya tiene un contrato ACTIVO en la base de datos
             List<Contrato> activos = contratoRepository.findByPropiedadIdAndEstado(contrato.getPropiedad().getId(), EstadoContrato.ACTIVO);
             
@@ -200,11 +205,27 @@ public class ContratoServiceImpl implements ContratoService{
             if (!activos.isEmpty()) {
                 throw new IllegalArgumentException("¡Error! La propiedad ya cuenta con un contrato ACTIVO vigente.");
             }
+            Propiedad propiedad = contrato.getPropiedad();
+            if(propiedad != null) {
+            	propiedad.setEstadoDisponibilidad(EstadoDisponibilidad.ALQUILADA);
+            	propiedadRepository.save(propiedad);
+            }
+            
+         //  Lógica para pasar de de FINALIZADO O RESCINDIDO a propiedad DISPONIBLE.
+            if (nuevoEstado == EstadoContrato.FINALIZADO || nuevoEstado == EstadoContrato.RESCINDIDO) {
+                if (propiedad != null) {
+                    // REGLA: La propiedad vuelve a estar DISPONIBLE
+                    propiedad.setEstadoDisponibilidad(EstadoDisponibilidad.DISPONIBLE);
+                    propiedadRepository.save(propiedad);
+                }
+            }
+            
         }
 
         // 5. Si no saltó ningún error, guardamos el nuevo estado en la BD
         contrato.setEstado(nuevoEstado);
         contratoRepository.save(contrato);
+        
     }
 }
 	
