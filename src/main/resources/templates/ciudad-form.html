@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Nueva Ciudad</title>
+</head>
+
+<body>
+
+	<h1>Alta de Ciudad</h1>
+
+	<div th:if="${error}">
+		<h3 style="color:red" th:text="${error}"></h3>
+	</div>
+
+	<form th:action="@{/ciudades}" th:object="${ciudadForm}" method="post">
+
+		<input type="hidden" th:field="*{id}">
+
+		<label>Nombre:</label>
+
+		<input type="text" th:field="*{nombre}">
+
+		<div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color:red">
+		</div>
+
+		<br><br>
+
+		<label>Provincia:</label>
+
+		<select th:field="*{provinciaId}">
+			<option value="">Seleccione...</option>
+
+			<option th:each="provincia : ${provincias}" th:value="${provincia.id}" th:text="${provincia.nombre}">
+			</option>
+		</select>
+
+		<br><br>
+
+		<button type="submit">
+			Guardar
+		</button>
+
+	</form>
+
+	<br>
+
+	<a href="/ciudades">
+		Volver al listado
+	</a>
+
+</body>
+
+</html>

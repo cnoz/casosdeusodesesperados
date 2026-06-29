@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Nueva Propiedad</title>
+</head>
+
+<body>
+
+	<h1>Alta De Propiedad</h1>
+
+	<div th:if="${error}">
+		<h3 style="color:red" th:text="${error}"></h3>
+	</div>
+
+	<form th:action="@{/propiedades}" th:object="${propiedadForm}" method="post">
+		<input type="hidden" th:field="*{id}">
+
+		<!-- DIRECCION -->
+		<label>Dirección:</label>
+		<input type="text" th:field="*{direccion}">
+
+		<div th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}" style="color:red">
+		</div>
+		<br><br>
+
+		<!-- TIPO DE PROPIEDAD -->
+		<label>Tipo de Propiedad:</label>
+		<select th:field="*{tipo}">
+			<option value="">Seleccione...</option>
+			<option th:each="tipo : ${tipos}" th:value="${tipo}" th:text="${tipo}">
+			</option>
+		</select>
+		
+		<br><br>
+
+		<!-- CANTIDAD DE AMBIENTES -->
+		<label>Cantidad de Ambientes:</label>
+		<input type="number" th:field="*{cantidadAmbientes}" min="1">
+		<br><br>
+
+		<!-- METROS CUADRADOS -->
+		<label>Metros Cuadrados:</label>
+		<input type="number" step="0.01" th:field="*{metrosCuadrados}" min="1">
+		<br><br>
+
+		<!-- DESCRIPCION -->
+		<label>Descripción:</label>
+		<input type="text" th:field="*{descripcion}">
+		<br><br>
+
+		<!-- COMODIDADES-->
+		<label>Comodidades:</label>
+		<input type="text" th:field="*{comodidades}">
+		<br><br>
+
+		<!-- ESTADO -->
+		<label>Estado:</label>
+		<select th:field="*{estadoDisponibilidad}">
+			<option th:each="estado : ${estados}" th:value="${estado}" th:text="${estado}">
+			</option>
+		</select>
+		<br><br>
+
+		<!-- CIUDAD -->
+		<label>Ciudad:</label>
+		<select th:field="*{ciudadId}">
+			<option value="">
+				Seleccione...
+			</option>
+			<option th:each="ciudad : ${ciudades}" th:value="${ciudad.id}" th:text="${ciudad.nombre}">
+			</option>
+		</select>
+		<div th:if="${#fields.hasErrors('ciudadId')}" th:errors="*{ciudadId}" style="color:red">
+		</div>
+		<br><br>
+
+		<!-- PROPIETARIO -->
+		<label>Propietario:</label>
+		<select th:field="*{propietarioId}">
+			<option value="">Seleccione...</option>
+			<option th:each="propietario : ${propietarios}" th:value="${propietario.id}"
+				th:text="${propietario.nombre + ' ' + propietario.apellido}">
+			</option>
+		</select>
+
+		<div th:if="${#fields.hasErrors('propietarioId')}" th:errors="*{propietarioId}" style="color:red">
+		</div>
+		<br><br>
+
+		<button type="submit">Guardar</button>
+
+	</form>
+
+	<br>
+
+	<a href="/propiedades">Volver al listado</a>
+
+</body>
+
+</html>

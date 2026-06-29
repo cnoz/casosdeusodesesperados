@@ -46,10 +46,13 @@ public class Contrato {
 	
 	@NotNull(message = "La duración es obligatoria")
     @Positive(message = "La duración debe ser mayor a 0 meses")
+	@Max(value=36, message="La duración de los contratos tiene un maximo de 36 meses.")
 	private Integer duracionMeses;
+	
 	@NotNull(message = "El importe es obligatorio")
     @Positive(message = "El importe debe ser un número positivo") // <-- Evita negativos y cero
 	private BigDecimal importeMensual;
+	
 	@NotNull(message = "El día de vencimiento es obligatorio")
     @Min(value = 1, message = "El día mínimo es 1")
     @Max(value = 31, message = "El día máximo es 31")

@@ -2,57 +2,41 @@ package com.desi.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.desi.entity.Propiedad;
-import com.desi.repository.PropiedadRepository;
+import com.desi.entity.EstadoDisponibilidad;
+import com.desi.entity.TipoPropiedad;
 
-@Service
-public class PropiedadService {
+import tuti.desi.excepciones.Excepcion;
 
-	@Autowired
-	private PropiedadRepository propiedadRepository;
 
-	// GUARDAR PROPIEDAD EN LA BD
-	public Propiedad guardar(Propiedad propiedad) {
 
-		// Verifico si la direccion esta cargada o vacia
-		if (propiedad.getDireccion() == null || propiedad.getDireccion().isBlank()) {
-			throw new RuntimeException("La dirección es obligatoria");
-		}
+	public interface PropiedadService {
 
-		// Verifico si la descripcion esta cargada o vacia
-		if (propiedad.getDescripcion() == null || propiedad.getDescripcion().isBlank()) {
-			throw new RuntimeException("La descripción es obligatoria");
-		}
-		
-		// Verifico si la cantidad de ambientes esta vacia o si es mayor o igual a 0
-		if (propiedad.getCantidadAmbientes() == null || propiedad.getCantidadAmbientes() <= 0) {
-			throw new RuntimeException("La cantidad de ambientes debe ser mayor a cero");
-		}
+		// METODO GUARDAR PROPIEDAD
+		Propiedad guardar(Propiedad propiedad) throws Excepcion, excepciones.Excepcion;
 
-		// Verifico si los metros cuadrados esten cargados y sean mayor o igual a cero
-		if (propiedad.getMetrosCuadrados() == null || propiedad.getMetrosCuadrados() <= 0) {
-			throw new RuntimeException("Los metros cuadrados deben ser mayores a cero");
-		}
+		// METODO LISTAR PROPIEDAD
+		List<Propiedad> listarTodas();
 
-		//si esta todo ok, lo guarda y lo carga
-		return propiedadRepository.save(propiedad);
+		// METODO BUSCAR PROPIEDAD
+		Propiedad buscarPorId(Long id);
+
+		// METODO ELIMINAR PROPIEDAD
+		void eliminar(Long id) throws Excepcion, excepciones.Excepcion;
+
+		// METODO BUSCAR PROPIEDAD POR DIRECCION
+		List<Propiedad> buscarPorDireccion(String direccion);
+
+		// METODO BUSCAR PROPIEDAD POR CIUDAD
+		List<Propiedad> buscarPorCiudad(Long ciudadId);
+
+		// METODO BUSCAR PROPIEDAD POR TIPO
+		List<Propiedad> buscarPorTipo(TipoPropiedad tipo);
+
+		// METODO BUSCAR PROPIEDAD POR ESTADO
+		List<Propiedad> buscarPorEstado(EstadoDisponibilidad estado);
+
+		// Busca propiedades aplicando varios filtros al mismo tiempo.
+		// Si algun filtro viene vacio, no se tiene en cuenta en la busqueda
+		List<Propiedad> buscarConFiltros(String direccion, Long ciudadId, TipoPropiedad tipo, EstadoDisponibilidad estado);
 	}
-
-	// LISTAR PROPIEDADES
-	public List<Propiedad> listarTodas() {
-		return propiedadRepository.findAll();
-	}
-
-	// EDITAR PROPIEDAD
-	public Propiedad buscarPorId(Long id) {
-		return propiedadRepository.findById(id).orElse(null);
-	}
-
-	// ELIMINAR PROPIEDAD
-	public void eliminar(Long id) {
-		propiedadRepository.deleteById(id);
-	}
-}

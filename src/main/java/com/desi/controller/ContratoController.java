@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.desi.entity.Contrato;
 import com.desi.entity.EstadoContrato;
@@ -56,8 +57,7 @@ public class ContratoController {
     // 2. GUARDAR CONTRATO
     @PostMapping("/contratos")
     public String guardar(@Valid @ModelAttribute("contrato") Contrato contrato, BindingResult result, Model model) {
-    	//System.out.println("ID DEL CONTRATO RECIBIDO: " + contrato.getId());
-        // Si hay errores, volvemos a cargar las listas para los desplegables
+
         if (result.hasErrors()) {
             model.addAttribute("propiedades", propiedadService.listarTodas());
             model.addAttribute("inquilinos", personaService.listarTodas());
@@ -71,14 +71,9 @@ public class ContratoController {
         
         try {
         	
-        	if(contrato.getId() != null) {
-        		contratoService.cambiarEstado(contrato.getId(), contrato.getEstado());
-        	} else {
-        		contratoService.guardar(contrato);
-        	}
-        	       	        	  
-        	  return "redirect:/contratos";
-       
+        	contratoService.guardar(contrato);
+        	return "redirect:/contratos";
+
         } catch(IllegalArgumentException e) { 
             // Capturamos el error específico de tus reglas de negocio
             result.rejectValue("estado", "error.contrato", e.getMessage());
@@ -146,14 +141,21 @@ public class ContratoController {
 
     
     
-    // 5. ELIMINAR CONTRATO
+    
+
+ // 5. ELIMINAR CONTRATO
     @GetMapping("/contrato/eliminar/{id}")
-    public String eliminar(@PathVariable Long id) {
-        contratoService.eliminar(id);
+    public String eliminar(@PathVariable Long id, RedirectAttributes flash) {
+        try {
+            contratoService.eliminar(id);
+            flash.addFlashAttribute("success", "El contrato se eliminó correctamente.");
+        } catch (IllegalArgumentException e) {
+            // Aquí capturamos el error si no era borrador y se lo enviamos a la vista
+        	System.out.println("\n log controlador: detuvo el borrado "  + e.getMessage());
+            flash.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/contratos";
     }
-    
-    
     
     
     
